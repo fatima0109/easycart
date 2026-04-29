@@ -1,0 +1,38 @@
+/* External CSS Theme Variables */
+:root {
+  --navy-deep: #1F2A44;
+  --copper-muted: #C97C5D;
+  --beige-soft: #F5F3EF;
+  --text-dark: #222222;
+  --gray-muted: #6B6B6B;
+}
+
+/* Reusable Bootstrap-Tailwind Hybrid Classes */
+.btn-premium {
+  background-color: var(--copper-muted);
+  color: white;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-premium:hover {
+  background-color: #B96A4E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(201, 124, 93, 0.3);
+}
+
+.card-premium {
+  background: white;
+  border: 1px solid #E0E0E0;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-premium:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}

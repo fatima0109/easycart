@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  --primary:        #1F2A44;
+  --primary-dark:   #162033;
+  --accent:         #C97C5D;
+  --accent-dark:    #B96A4E;
+  --bg:             #F5F3EF;
+  --bg-alt:         #FAFAFA;
+  --white:          #FFFFFF;
+  --text:           #222222;
+  --text-muted:     #6B6B6B;
+  --text-subtle:    #9E9E9E;
+  --border:         #E0E0E0;
+  --hover-grey:     #F0F0F0;
+  --success:        #4CAF50;
+  --warning:        #F0AD4E;
+  --error:          #D9534F;
+  --info:           #5BC0DE;
+  --bs-primary:     #1F2A44;
+  --bs-body-font-family: 'Poppins', sans-serif;
+  --bs-body-bg:     #F5F3EF;
+  --bs-body-color:  #222222;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.search-container {
+  display: flex;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 42px;
+  transition: border-color 0.2s;
+}
+.search-container:focus-within { border-color: var(--accent); }
+
+.btn-primary { background-color: var(--accent) !important; border-color: var(--accent) !important; font-weight: 700; border-radius: 8px; }
+.btn-primary:hover, .btn-primary:focus { background-color: var(--accent-dark) !important; border-color: var(--accent-dark) !important; }
+.btn-dark { background-color: var(--primary) !important; border-color: var(--primary) !important; font-weight: 700; border-radius: 8px; }
+.btn-dark:hover, .btn-dark:focus { background-color: var(--primary-dark) !important; border-color: var(--primary-dark) !important; }
+.btn-outline-primary { color: var(--primary) !important; border-color: var(--primary) !important; }
+.btn-outline-primary:hover { background-color: var(--primary) !important; color: white !important; }
+.btn-custom-primary { background-color: var(--accent) !important; color: white !important; border: none; font-weight: 700; }
+.btn-custom-primary:hover { background-color: var(--accent-dark) !important; }
+.bg-custom-primary { background-color: var(--accent) !important; }
+
+.card { border: 1px solid var(--border) !important; box-shadow: 0px 2px 8px rgba(0,0,0,0.05) !important; border-radius: 12px !important; }
+.product-card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; }
+.product-card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important; }
+
+.form-control, .form-select { border: 1px solid var(--border); border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 0.875rem; color: var(--text); background-color: var(--white); transition: border-color 0.2s, box-shadow 0.2s; }
+.form-control:focus, .form-select:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(201, 124, 93, 0.15) !important; outline: none; }
+.form-control::placeholder { color: var(--text-subtle); }
+
+.table-dark th { background-color: var(--primary) !important; color: white; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; border: none !important; }
+.table > :not(caption) > * > * { padding: 1rem 1.25rem; }
+.table tbody tr:hover { background-color: var(--hover-grey) !important; }
+
+.hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
+.hover-lift:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.12) !important; }
+.hover-grey:hover { background-color: var(--hover-grey) !important; color: var(--primary) !important; }
+
+.line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+.line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.sticky-top { top: 100px !important; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-subtle); }
+
+@media (max-width: 576px) { .mobile-hide { display: none !important; } }

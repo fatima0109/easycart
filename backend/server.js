@@ -1,23 +1,55 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import connectDB from './config/db.js';
-import cors from 'cors';
-import authRoutes from './routes/auth.js';
-import productRoutes from './routes/products.js';
-import orderRoutes from './routes/orders.js';
-import userRoutes from './routes/users.js';
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import path from "path";
+import cors from "cors";
+
+import authRoutes from "./routes/auth.route.js";
+import productRoutes from "./routes/product.route.js";
+import cartRoutes from "./routes/cart.route.js";
+import couponRoutes from "./routes/coupon.route.js";
+import paymentRoutes from "./routes/payment.route.js";
+import analyticsRoutes from "./routes/analytics.route.js";
+import orderRoutes from "./routes/order.route.js";
+
+import { connectDB } from "./lib/db.js";
 
 dotenv.config();
-connectDB();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/users', userRoutes);   // <-- new
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const __dirname = path.resolve();
+
+app.use(express.json({ limit: "10mb" })); // allows you to parse the body of the request
+app.use(cookieParser());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/orders", orderRoutes);
+
+if (process.env.NODE_ENV === "production") {
+    // This finds the path regardless of whether you are in /backend or /easycart
+    const frontendPath = path.resolve(process.cwd(), "frontend", "dist");
+    
+    app.use(express.static(frontendPath));
+
+    // Change "*" to "*all" to fix the PathError crash
+    app.get("*all", (req, res) => {
+        res.sendFile(path.join(frontendPath, "index.html"));
+    });
+}
+
+app.use(cors({
+  origin: process.env.CLIENT_URL, // You will set this later
+  credentials: true
+}));
+
+app.listen(PORT, () => {
+	console.log("Server is running on http://localhost:" + PORT);
+	connectDB();
+});
