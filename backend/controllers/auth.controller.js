@@ -15,7 +15,8 @@ const generateTokens = (userId) => {
 };
 
 const storeRefreshToken = async (userId, refreshToken) => {
-	await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 604800); // 7days
+    // Upstash requires an object { ex: seconds } for expiration
+	await redis.set(`refresh_token:${userId}`, refreshToken, { ex: 604800 }); // 7 days
 };
 
 const setCookies = (res, accessToken, refreshToken) => {

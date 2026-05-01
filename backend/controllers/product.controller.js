@@ -58,17 +58,19 @@ export const getProductsByCategory = async (req, res) => {
 	}
 };
 
-// 4. Featured Products (With Redis Caching)
 export const getFeaturedProducts = async (req, res) => {
 	try {
 		let featuredProducts = await redis.get("featured_products");
+		
 		if (featuredProducts) {
-			return res.json(JSON.parse(featuredProducts));
+			// Upstash often auto-parses JSON. 
+			// We check if it's already an object before trying to parse it.
+			return res.json(typeof featuredProducts === "string" ? JSON.parse(featuredProducts) : featuredProducts);
 		}
 
 		featuredProducts = await Product.find({ isFeatured: true }).lean();
 
-		if (!featuredProducts) {
+		if (!featuredProducts || featuredProducts.length === 0) {
 			return res.status(404).json({ message: "No featured products found" });
 		}
 
@@ -183,8 +185,9 @@ export const getRecommendedProducts = async (req, res) => {
 async function updateFeaturedProductsCache() {
 	try {
 		const featuredProducts = await Product.find({ isFeatured: true }).lean();
+		// Storing as string to keep logic consistent
 		await redis.set("featured_products", JSON.stringify(featuredProducts));
 	} catch (error) {
-		console.log("error in update cache function");
+		console.log("error in update cache function", error.message);
 	}
 }
