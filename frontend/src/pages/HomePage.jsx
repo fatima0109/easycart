@@ -11,12 +11,12 @@ import PriceFilter from "../components/PriceFilter";
 import { useProductStore } from "../stores/useProductStore";
 
 const categories = [
-	{ href: "jewellery", name: "Jewellery", imageUrl: "/jewellery.jpg" },
-	{ href: "gaming", name: "Gaming Setup", imageUrl: "/gaming.jpeg" },
-	{ href: "kitchen", name: "Kitchen Essentials", imageUrl: "/kitchen.jpeg" },
+	{ href: "jewellery", name: "Jewellery", imageUrl: "/jewellery.jpeg" },
+	{ href: "gaming", name: "Gaming Setup", imageUrl: "/gaming.webp" },
+	{ href: "kitchen", name: "Kitchen Essentials", imageUrl: "/kitchen.jpg" },
 	{ href: "fashion", name: "Modern Fashion", imageUrl: "/fashion.jpg" },
-	{ href: "appliances", name: "Home Appliances", imageUrl: "/appliances.jpeg" },
-	{ href: "electronics", name: "Electronics", imageUrl: "/electronics.jpeg" },
+	{ href: "appliances", name: "Home Appliances", imageUrl: "/appliances.jpg" },
+	{ href: "electronics", name: "Electronics", imageUrl: "/electronics.webp" },
 ];
 
 const HomePage = () => {
