@@ -45,8 +45,8 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(cors({
-  origin: process.env.CLIENT_URL, // You will set this later
-  credentials: true
+	origin: process.env.CLIENT_URL, // This uses the Render Environment Variable
+	credentials: true,
 }));
 
 app.listen(PORT, "0.0.0.0", () => {
