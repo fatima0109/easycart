@@ -11,7 +11,7 @@ import PriceFilter from "../components/PriceFilter";
 import { useProductStore } from "../stores/useProductStore";
 
 const categories = [
-	{ href: "jewellery", name: "Jewellery", imageUrl: "/jewellery.jpeg" },
+	{ href: "jewellery", name: "Jewellery", imageUrl: "/jewellery.jpg" },
 	{ href: "gaming", name: "Gaming Setup", imageUrl: "/gaming.webp" },
 	{ href: "kitchen", name: "Kitchen Essentials", imageUrl: "/kitchen.jpg" },
 	{ href: "fashion", name: "Modern Fashion", imageUrl: "/fashion.jpg" },
