@@ -22,14 +22,14 @@ const storeRefreshToken = async (userId, refreshToken) => {
 const setCookies = (res, accessToken, refreshToken) => {
 	res.cookie("accessToken", accessToken, {
 		httpOnly: true, 
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict",
+		secure: true, // Must be true for cross-site cookies
+		sameSite: "none", // REQUIRED for Vercel -> Render communication
 		maxAge: 15 * 60 * 1000, 
 	});
 	res.cookie("refreshToken", refreshToken, {
 		httpOnly: true, 
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict",
+		secure: true, 
+		sameSite: "none", // REQUIRED for Vercel -> Render communication
 		maxAge: 7 * 24 * 60 * 60 * 1000, 
 	});
 };
