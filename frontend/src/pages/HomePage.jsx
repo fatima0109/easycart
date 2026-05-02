@@ -105,11 +105,8 @@ const HomePage = () => {
                                             Discover a curated selection of high-end jewellery, <br className="d-none d-md-block" /> pro gaming gear, and modern home essentials.
                                         </p>
                                         <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                                            <Link to='/category/fashion' className='btn bg-[#FF782D] text-white px-5 py-3 rounded-3 fw-bold shadow-sm hover-lift border-0'>
+                                            <Link to='/category/fashion' className='btn bg-[#C97C5D] text-white px-5 py-3 rounded-3 fw-bold shadow-sm hover-lift border-0'>
                                                 Shop Collection <ArrowRight className='ms-2' size={18} />
-                                            </Link>
-                                            <Link to='/category/gaming' className='btn bg-white border border-[#E0E0E0] text-[#1F2A44] px-5 py-3 rounded-3 fw-bold hover-grey'>
-                                                Gaming Tech
                                             </Link>
                                         </div>
                                     </motion.div>
