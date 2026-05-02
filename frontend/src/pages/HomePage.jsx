@@ -106,7 +106,7 @@ const HomePage = () => {
                                         </p>
                                         <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
                                             <Link 
-                                                to='/category/fashion' 
+                                                to='/search' 
                                                 className='btn text-white px-5 py-3 rounded-3 fw-bold shadow-sm hover-lift border-0'
                                                 style={{ backgroundColor: '#C97C5D' }}
                                             >
@@ -222,7 +222,7 @@ const HomePage = () => {
                                     <div className="position-relative z-1">
                                         <h2 className="display-5 fw-bold mb-3">Upgrade Your Lifestyle</h2>
                                         <p className="text-gray-400 mb-5 h5 fw-normal">Join 50,000+ shoppers who trust ShopHub for premium quality gear.</p>
-                                        <Link to="/category/fashion" className="btn bg-[#FF782D] text-white px-5 py-3 rounded-3 fw-bold border-0 hover-lift shadow">
+                                        <Link to="/search" className="btn text-white px-5 py-3 rounded-3 fw-bold border-0 hover-lift shadow" style={{ backgroundColor: '#C97C5D' }}>
                                             Start Shopping Today <ArrowRight className="ms-2" size={18} />
                                         </Link>
                                     </div>
