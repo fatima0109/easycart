@@ -220,7 +220,7 @@ const HomePage = () => {
                                 <div className="col-lg-10 bg-[#1F2A44] rounded-4 p-5 text-center text-white shadow-2xl overflow-hidden position-relative">
                                     <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundColor: '#FFFFFF', opacity: 0.03 }}></div>
                                     <div className="position-relative z-1">
-                                        <h2 className="display-5 fw-bold mb-3">Upgrade Your Lifestyle</h2>
+                                        <h2 className="display-5 h2 fw-bold text-[#1F2A44] mb-3">Upgrade Your Lifestyle</h2>
                                         <p className="text-gray-400 mb-5 h5 fw-normal">Join 50,000+ shoppers who trust ShopHub for premium quality gear.</p>
                                         <Link to="/search" className="btn text-white px-5 py-3 rounded-3 fw-bold border-0 hover-lift shadow" style={{ backgroundColor: '#C97C5D' }}>
                                             Start Shopping Today <ArrowRight className="ms-2" size={18} />

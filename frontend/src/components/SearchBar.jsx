@@ -3,15 +3,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 /**
- * SearchBar Component - Amazon Style Redesign
- * Layout: [ All v ] [ Search products...          ] [ Q ]
+ * SearchBar Component - Forced Amazon Design
+ * Uses Inline Styles to override Bootstrap interference.
  */
 const SearchBar = ({ onClose }) => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [category, setCategory] = useState("all");
 	const navigate = useNavigate();
 
-	// Category list based on your store's categories
 	const categories = [
 		{ id: "all", name: "All" },
 		{ id: "jewellery", name: "Jewellery" },
@@ -25,10 +24,8 @@ const SearchBar = ({ onClose }) => {
 	const handleSearch = (e) => {
 		e.preventDefault();
 		if (searchQuery.trim()) {
-			// Navigates with both search term and category
 			let url = `/search?search=${encodeURIComponent(searchQuery.trim())}`;
 			if (category !== "all") url += `&category=${category}`;
-			
 			navigate(url);
 			setSearchQuery("");
 			onClose?.(); 
@@ -39,52 +36,116 @@ const SearchBar = ({ onClose }) => {
 		<form 
 			id='search-form' 
 			onSubmit={handleSearch} 
-			className='flex items-center w-full h-10 bg-white border border-[#E0E0E0] rounded-md overflow-hidden'
+			style={{
+				display: 'flex',
+				alignItems: 'center',
+				width: '100%',
+				height: '40px',
+				backgroundColor: '#FFFFFF',
+				border: '1px solid #E0E0E0',
+				borderRadius: '6px',
+				overflow: 'hidden'
+			}}
 		>
-			{/* Left Category Selector Block - Matches Amazon style */}
-			<div className='relative h-full flex items-center bg-[#F3F3F3] border-r border-[#E0E0E0] hover:bg-[#EAEAEA] transition-colors'>
+			{/* Left Category Section */}
+			<div style={{
+				position: 'relative',
+				display: 'flex',
+				alignItems: 'center',
+				height: '100%',
+				backgroundColor: '#F3F3F3',
+				borderRight: '1px solid #E0E0E0',
+				padding: '0 10px'
+			}}>
 				<select
 					value={category}
 					onChange={(e) => setCategory(e.target.value)}
-					className='h-full pl-3 pr-7 bg-transparent border-none outline-none text-[#555] font-medium text-xs cursor-pointer appearance-none z-10'
+					style={{
+						height: '100%',
+						backgroundColor: 'transparent',
+						border: 'none',
+						outline: 'none',
+						fontSize: '13px',
+						fontWeight: '600',
+						color: '#555555',
+						cursor: 'pointer',
+						appearance: 'none',
+						paddingRight: '20px',
+						zIndex: 2
+					}}
 				>
 					{categories.map((cat) => (
-						<option key={cat.id} value={cat.id}>
-							{cat.name}
-						</option>
+						<option key={cat.id} value={cat.id}>{cat.name}</option>
 					))}
 				</select>
-				<ChevronDown className='absolute right-2 h-3 w-3 text-[#555] pointer-events-none' />
+				<ChevronDown style={{
+					position: 'absolute',
+					right: '8px',
+					height: '14px',
+					width: '14px',
+					color: '#555555',
+					pointerEvents: 'none'
+				}} />
 			</div>
 
-			{/* Middle Input Area - flex-grow ensures it fills all space till the copper icon */}
-			<div className='relative flex-grow h-full flex items-center'>
+			{/* Center Input Area - Fills all space till copper button */}
+			<div style={{ position: 'relative', flexGrow: 1, height: '100%' }}>
 				<input
 					type='text'
 					placeholder='Search products...'
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className='w-full h-full px-4 border-none outline-none bg-transparent text-[#222222] placeholder-[#9E9E9E] font-medium text-sm'
+					style={{
+						width: '100%',
+						height: '100%',
+						padding: '0 15px',
+						border: 'none',
+						outline: 'none',
+						backgroundColor: 'transparent',
+						fontSize: '14px',
+						color: '#222222',
+						boxShadow: 'none' // Removes Bootstrap focus glow
+					}}
 				/>
 				
-				{/* Clear (X) Button */}
 				{searchQuery && (
 					<button
 						type='button'
 						onClick={() => setSearchQuery("")}
-						className='absolute right-2'
+						style={{
+							position: 'absolute',
+							right: '10px',
+							top: '50%',
+							transform: 'translateY(-50%)',
+							background: 'none',
+							border: 'none',
+							padding: 0,
+							cursor: 'pointer'
+						}}
 					>
-						<X className='h-4 w-4 text-[#9E9E9E] hover:text-[#222222]' />
+						<X size={16} color="#9E9E9E" />
 					</button>
 				)}
 			</div>
 
-			{/* Right Copper Search Icon Block */}
+			{/* Right Copper Button Block */}
 			<button
 				type='submit'
-				className='bg-[#C97C5D] h-full px-5 flex items-center justify-center hover:bg-[#b36b4f] transition-colors'
+				style={{
+					backgroundColor: '#C97C5D',
+					height: '100%',
+					width: '50px',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					border: 'none',
+					cursor: 'pointer',
+					transition: 'background-color 0.2s'
+				}}
+				onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#b36b4f'}
+				onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#C97C5D'}
 			>
-				<Search className='h-5 w-5 text-white' strokeWidth={2.5} />
+				<Search size={20} color="white" strokeWidth={2.5} />
 			</button>
 		</form>
 	);
