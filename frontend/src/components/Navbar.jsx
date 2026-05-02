@@ -57,21 +57,9 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* CENTER: Search */}
+          {/* CENTER: Search - CLEANED UP TO REMOVE DUPLICATES */}
           <div className="col flex-grow-1 px-md-4">
-            <div className="search-container">
-              <div className="d-none d-md-flex align-items-center px-3 border-end" style={{ backgroundColor: '#F5F3EF', fontSize: '0.8rem', fontWeight: 700, color: '#6B6B6B', whiteSpace: 'nowrap' }}>
-                All <ChevronDown size={13} className="ms-1" />
-              </div>
-              <div className="flex-grow-1 d-flex align-items-center">
-                <SearchBar />
-              </div>
-              <button className="btn-custom-primary px-3 d-flex align-items-center justify-content-center" style={{ borderRadius: 0, border: 'none', minWidth: '46px' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
+              <SearchBar />
           </div>
 
           {/* RIGHT: Actions */}
