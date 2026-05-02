@@ -14,6 +14,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   return (
+  <>
     <header className="fixed-top bg-white" style={{ borderBottom: '1px solid #E0E0E0', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', zIndex: 1000 }}>
 
       {/* TOP STRIP */}
@@ -216,6 +217,13 @@ const Navbar = () => {
         )}
       </AnimatePresence>
     </header>
+
+    {/* --- CONTENT SPACER --- */}
+      {/* This pushes the "Admin Dashboard" and other page content down so it doesn't hide behind the navbar */}
+      <div className="d-none d-md-block" style={{ height: '125px' }}></div>
+      <div className="d-md-none" style={{ height: '85px' }}></div>
+  </>
+      
   );
 };
 

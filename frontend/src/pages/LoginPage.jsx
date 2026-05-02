@@ -97,7 +97,7 @@ const LoginPage = () => {
               {/* BOOTSTRAP 'btn' and 'btn-primary' applied */}
               <button
                 type="submit"
-                className="btn btn-primary w-full flex justify-center items-center gap-2 py-3 px-4 border-0 rounded-lg shadow-md text-sm font-bold text-white bg-[#C97C5D] hover:bg-[#B96A4E] transition-all disabled:opacity-50"
+                className="btn btn-primary w-full flex justify-center items-center gap-2 py-3 px-4 border-0 rounded-lg shadow-md text-sm font-bold text-white bg-[#C97C5D] hover:bg-[#B96A4E] transition-all disabled:opacity-50 mt-4"
                 disabled={loading}
               >
                 {loading ? (
