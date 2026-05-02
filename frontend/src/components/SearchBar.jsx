@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 /**
  * SearchBar Component - Professional Formal Redesign
- * Uses White (#FFFFFF), Neutral Border (#E0E0E0), and Copper focus (#C97C5D)
+ * Fixed to match Amazon-style layout with Copper search block
  */
 const SearchBar = ({ onClose }) => {
 	const [searchQuery, setSearchQuery] = useState("");
@@ -13,41 +13,47 @@ const SearchBar = ({ onClose }) => {
 	const handleSearch = (e) => {
 		e.preventDefault();
 		if (searchQuery.trim()) {
-			// Updated to /search to hit the SearchResultsPage
 			navigate(`/search?search=${encodeURIComponent(searchQuery.trim())}`);
 			setSearchQuery("");
-			onClose?.(); // Close mobile menu if this prop is passed
+			onClose?.(); 
 		}
 	};
 
 	return (
-		<form id='search-form' onSubmit={handleSearch} className='w-full h-full flex items-center'>
-			<div className='relative w-full px-2'>
+		<form 
+			id='search-form' 
+			onSubmit={handleSearch} 
+			className='w-full h-10 flex items-center bg-white border border-[#E0E0E0] rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-[#C97C5D]'
+		>
+			{/* Text Input Area - Fills all available space */}
+			<div className='relative flex-grow h-full flex items-center'>
 				<input
 					type='text'
 					placeholder='Search products...'
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className='w-full px-4 py-1.5 pr-12 rounded-lg bg-white border border-transparent text-[#222222] placeholder-[#9E9E9E] focus:outline-none transition-all font-medium text-sm'
+					className='w-full h-full px-4 bg-transparent text-[#222222] placeholder-[#9E9E9E] focus:outline-none font-medium text-sm'
 				/>
 				
-				{/* Right-aligned Icons Container */}
-				<div className="absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-2">
-					{searchQuery && (
-						<button
-							type='button'
-							onClick={() => setSearchQuery("")}
-							className='flex items-center'
-						>
-							{/* Clear Icon */}
-							<X className='h-4 w-4 text-[#9E9E9E] hover:text-[#1F2A44] transition-colors' />
-						</button>
-					)}
-					
-					{/* Copper Search Icon at the end */}
-					<Search className='h-4 w-4 text-[#C97C5D]' />
-				</div>
+				{/* Clear (X) Button - Only shows when typing */}
+				{searchQuery && (
+					<button
+						type='button'
+						onClick={() => setSearchQuery("")}
+						className='px-2'
+					>
+						<X className='h-4 w-4 text-[#9E9E9E] hover:text-[#222222] transition-colors' />
+					</button>
+				)}
 			</div>
+
+			{/* Copper Search Icon Block - Fixed to the end */}
+			<button
+				type='submit'
+				className='bg-[#C97C5D] h-full px-5 flex items-center justify-center hover:bg-[#b36b4f] transition-colors'
+			>
+				<Search className='h-5 w-5 text-white' />
+			</button>
 		</form>
 	);
 };
