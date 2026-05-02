@@ -50,7 +50,7 @@ const SearchBar = ({ onClose }) => {
 			<div className="h-6 w-px bg-[#E5E5E5]"></div>
 
 			{/* Text Area: Fills all space from the divider till the copper icon */}
-			<div className='relative flex-1 h-full flex items-center'>
+			<div className='relative'>
 				<input
 					type='text'
 					placeholder='Search products...'
