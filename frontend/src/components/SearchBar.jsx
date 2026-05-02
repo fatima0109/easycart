@@ -32,7 +32,6 @@ const SearchBar = ({ onClose }) => {
 					placeholder='Search products...'
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className='w-full h-full px-4 border-none outline-none bg-transparent text-[#222222] placeholder-[#9E9E9E] font-medium text-sm'
 				/>
 
 				{/* Clear (X) Button - Positioned just before the copper icon */}
