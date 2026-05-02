@@ -1,17 +1,20 @@
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { ShoppingCart, Star, Heart, Eye } from "lucide-react"; // Added Eye
+import { ShoppingCart, Star, Heart, Eye } from "lucide-react"; 
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
-import { useQuickViewStore } from "../stores/useQuickViewStore"; // Import Store
-import { useState } from "react";
+import { useQuickViewStore } from "../stores/useQuickViewStore"; 
+import { useWishlistStore } from "../stores/useWishlistStore"; // NEW: Import Wishlist Store
 import { formatPrice } from "../utils/helpers";
 
 const ProductCard = ({ product }) => {
   const { user } = useUserStore();
   const { addToCart } = useCartStore();
-  const { openQuickView } = useQuickViewStore(); // Get global trigger
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { openQuickView } = useQuickViewStore(); 
+  
+  // NEW: Get Wishlist data and toggle function
+  const { wishlist, toggleWishlist } = useWishlistStore();
+  const isWishlisted = wishlist.some((item) => item._id === product._id);
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -23,7 +26,9 @@ const ProductCard = ({ product }) => {
   const handleWishlist = (e) => {
     e.stopPropagation();
     if (!user) { toast.error("Please login to add to wishlist"); return; }
-    setIsWishlisted(!isWishlisted);
+    
+    // Toggle in global store instead of local state
+    toggleWishlist(product);
     toast.success(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
   };
 
@@ -45,12 +50,11 @@ const ProductCard = ({ product }) => {
           src={product.image}
           alt={product.name}
           style={{ objectFit: 'contain', transition: 'transform 0.5s ease', cursor: 'pointer' }}
-          onClick={() => openQuickView(product)} // OPEN ON IMAGE CLICK
+          onClick={() => openQuickView(product)} 
           onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.06)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
         />
         
-        {/* Quick View Trigger (The Eye) */}
         <button
           onClick={(e) => { e.stopPropagation(); openQuickView(product); }}
           style={{
@@ -95,7 +99,7 @@ const ProductCard = ({ product }) => {
             {product.category}
           </small>
           <h6 
-            onClick={() => openQuickView(product)} // OPEN ON TITLE CLICK
+            onClick={() => openQuickView(product)} 
             className="line-clamp-1" 
             style={{ fontWeight: 700, color: '#222222', marginTop: '4px', cursor: 'pointer' }}
           >
