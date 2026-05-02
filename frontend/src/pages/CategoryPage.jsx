@@ -24,15 +24,6 @@ const CategoryPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <span style={{
-            display: 'inline-block',
-            backgroundColor: 'rgba(201,124,93,0.12)', color: '#C97C5D',
-            padding: '4px 16px', borderRadius: '999px',
-            fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase',
-            letterSpacing: '0.1em', marginBottom: '0.75rem'
-          }}>
-            Browse Collection
-          </span>
           <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#1F2A44', letterSpacing: '-0.5px', marginBottom: '0.5rem' }}>
             {category.charAt(0).toUpperCase() + category.slice(1)}
           </h1>
