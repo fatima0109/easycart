@@ -53,7 +53,7 @@ const Footer = () => {
                 { to: '/category/jewellery',  label: 'Jewellery'   },
                 { to: '/category/gaming',     label: 'Gaming'      },
                 { to: '/category/kitchen',    label: 'Kitchen'     },
-                { to: '/category/bags',       label: 'Bags'        },
+                { to: '/category/electronics',       label: 'Electronics'        },
               ].map(({ to, label }) => (
                 <li key={to}><Link to={to} style={linkStyle}>{label}</Link></li>
               ))}
@@ -115,7 +115,7 @@ const Footer = () => {
             <div className="d-flex flex-column gap-2 mt-4">
               {[
                 { icon: Phone,  text: '+1 (555) 123-4567' },
-                { icon: Mail,   text: 'support@shophub.com' },
+                { icon: Mail,   text: 'support@easycart.com' },
                 { icon: MapPin, text: '123 Commerce St, NY' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="d-flex align-items-center gap-2" style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)' }}>
@@ -132,7 +132,7 @@ const Footer = () => {
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 0' }}>
         <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
           <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginBottom: 0 }}>
-            © {new Date().getFullYear()} ShopHub Corporation. All rights reserved.
+            © {new Date().getFullYear()} EasyCart Corporation. All rights reserved.
           </p>
           <div className="d-flex gap-4">
             <Link to="/info/terms"   style={{ ...linkStyle, fontSize: '0.78rem' }}>Terms</Link>
