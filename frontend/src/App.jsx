@@ -21,6 +21,7 @@ import ProductsList from "./components/ProductsList";
 import AnalyticsTab from "./components/AnalyticsTab";
 import OrdersList from "./components/OrdersList";
 import ProductQuickView from "./components/ProductQuickView";
+import Wishlist from "./components/Wishlist"; 
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -57,7 +58,7 @@ function App() {
             <Route path='orders' element={<OrderHistoryPage />} />
             <Route path='me' element={<div style={{ padding: '1rem', color: '#1F2A44', fontWeight: 700 }}>Personal Info Section</div>} />
             <Route path='settings' element={<div style={{ padding: '1rem', color: '#1F2A44', fontWeight: 700 }}>Settings Section</div>} />
-            <Route path='wishlist' element={<div style={{ padding: '1rem', color: '#1F2A44', fontWeight: 700 }}>My Wishlist Section</div>} />
+            <Route path='wishlist' element={<Wishlist />} /> 
           </Route>
 
           {/* ADMIN ROUTES */}
