@@ -1,38 +1,21 @@
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-
+import { Resend } from 'resend';
+import dotenv from 'dotenv';
 dotenv.config();
 
-export const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use SSL
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-    // FORCE IPv4 to avoid the Render IPv6 'Network Unreachable' error
-    // 'family: 4' is the key here
-    family: 4, 
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendOTPEmail = async (email, otp) => {
-    const mailOptions = {
-        from: `"EasyCart" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Verify your EasyCart Account",
-        html: `<h1>Your code: ${otp}</h1>`,
-    };
-
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent successfully:", info.response);
-        return info;
+        await resend.emails.send({
+            from: 'onboarding@resend.dev', // Mandatory for free tier
+            to: email, 
+            subject: 'Verify your EasyCart Account',
+            html: `<h1>Your verification code is: ${otp}</h1>`,
+        });
+        console.log("Email sent via Resend API successfully");
     } catch (error) {
-        console.error("NODEMAILER ERROR:", error.message);
-        // On Render, sometimes mail fails but we don't want to crash the signup
-        // throw error; // Comment this out if you want signup to continue anyway for testing
+        console.error("RESEND ERROR:", error.message);
+        // Backup for demo: always log the OTP
+        console.log("!!! DEMO CODE (Copy this if email fails):", otp);
     }
 };
