@@ -15,6 +15,9 @@ import SearchResultsPage from "./pages/SearchResultsPage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
 import InfoPage from "./pages/InfoPage";
 import ProfilePage from "./pages/ProfilePage";
+import PersonalInfo from './pages/PersonalInfo'; 
+import AccountSettings from './pages/AccountSettings';
+
 
 import CreateProductForm from "./components/CreateProductForm";
 import ProductsList from "./components/ProductsList";
@@ -53,13 +56,15 @@ function App() {
           <Route path='/login' element={!user ? <LoginPage /> : <Navigate to="/" />} />
 
           {/* PROFILE ROUTES */}
-          <Route path='/profile' element={user ? <ProfilePage /> : <Navigate to='/login' />}>
-            <Route index element={<Navigate to="orders" />} />
-            <Route path='orders' element={<OrderHistoryPage />} />
-            <Route path='me' element={<div style={{ padding: '1rem', color: '#1F2A44', fontWeight: 700 }}>Personal Info Section</div>} />
-            <Route path='settings' element={<div style={{ padding: '1rem', color: '#1F2A44', fontWeight: 700 }}>Settings Section</div>} />
-            <Route path='wishlist' element={<Wishlist />} /> 
-          </Route>
+<Route path='/profile' element={user ? <ProfilePage /> : <Navigate to='/login' />}>
+  {/* If you want the profile to open "My Profile" by default, change "orders" to "me" below */}
+  <Route index element={<Navigate to="me" />} /> 
+  
+  <Route path='me' element={<PersonalInfo />} />
+  <Route path='settings' element={<AccountSettings />} />
+  <Route path='orders' element={<OrderHistoryPage />} />
+  <Route path='wishlist' element={<Wishlist />} /> 
+</Route>
 
           {/* ADMIN ROUTES */}
           <Route path='/secret-dashboard' element={user?.role === "admin" ? <AdminPage /> : <Navigate to='/login' />}>
