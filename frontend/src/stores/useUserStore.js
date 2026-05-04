@@ -8,37 +8,48 @@ export const useUserStore = create((set, get) => ({
 	loading: false,
 	checkingAuth: true,
 
-	// frontend/src/stores/useUserStore.js
+	signup: async ({ name, email, password, confirmPassword }) => {
+		set({ loading: true });
 
-signup: async ({ name, email, password, confirmPassword }) => {
-    set({ loading: true });
+		if (password !== confirmPassword) {
+			set({ loading: false });
+			toast.error("Passwords do not match");
+			return false;
+		}
 
-    if (password !== confirmPassword) {
-        set({ loading: false });
-        return toast.error("Passwords do not match");
-    }
+		try {
+			const res = await axios.post("/auth/signup", { name, email, password });
+			set({ loading: false });
+			toast.success(res.data.message || "OTP sent to your email!");
+			return true; // Return true to tell the component to show OTP field
+		} catch (error) {
+			set({ loading: false });
+			const message = error.response?.data?.message || "An error occurred during signup";
+			toast.error(message);
+			return false;
+		}
+	},
 
-    try {
-        const res = await axios.post("/auth/signup", { name, email, password });
-        set({ user: res.data, loading: false });
-        toast.success("Account created successfully!");
-    } catch (error) {
-        set({ loading: false });
-        // FIX: Display the actual message from the backend instead of a generic one
-        const message = error.response?.data?.message || "An error occurred during signup";
-        toast.error(message); 
-    }
-},
+	verifyOTP: async (email, otp) => {
+		set({ loading: true });
+		try {
+			const res = await axios.post("/auth/verify-otp", { email, otp });
+			// SUCCESS: Now the user is actually logged in and state is updated
+			set({ user: res.data, loading: false });
+			toast.success("Account verified successfully!");
+			return true;
+		} catch (error) {
+			set({ loading: false });
+			toast.error(error.response?.data?.message || "Invalid or expired OTP");
+			return false;
+		}
+	},
 
 	login: async (email, password) => {
 		set({ loading: true });
-
 		try {
 			const res = await axios.post("/auth/login", { email, password });
-			
-			// SUCCESS: Store the user object (including the role!) into state
 			set({ user: res.data, loading: false });
-			
 			toast.success("Welcome back!");
 		} catch (error) {
 			set({ loading: false });
@@ -60,7 +71,6 @@ signup: async ({ name, email, password, confirmPassword }) => {
 		set({ checkingAuth: true });
 		try {
 			const response = await axios.get("/auth/profile");
-			// Ensure role is present in the profile response
 			set({ user: response.data, checkingAuth: false });
 		} catch (error) {
 			set({ checkingAuth: false, user: null });
