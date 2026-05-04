@@ -1,6 +1,7 @@
 import { redis } from "../lib/redis.js";
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs"; // MISSING: Needed for password hashing/comparison
 import { sendOTPEmail } from "../lib/nodemailer.js";
 
 const generateTokens = (userId) => {
