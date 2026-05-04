@@ -39,28 +39,31 @@ export const signup = async (req, res) => {
 	try {
 		console.log("1. Signup request received for:", email);
 
-		// --- NEW: STRICT PASSWORD VALIDATION ---
-		// Requirements: 8+ chars, 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char
+		// --- PASSWORD VALIDATION ---
 		const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
 		if (!passwordRegex.test(password)) {
 			return res.status(400).json({ 
 				message: "Password security requirement not met: Must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character." 
 			});
 		}
-		// ---------------------------------------
 
 		const userExists = await User.findOne({ email });
 		if (userExists) {
 			return res.status(400).json({ message: "User already exists" });
 		}
 
-		const role = email.toLowerCase().endsWith("@easycart.com") ? "admin" : "customer";
+		// --- HARDCODED ADMIN LOGIC ---
+		// Define your master admin email here
+		const MASTER_ADMIN_EMAIL = "usertest9644@gmail.com"; 
 
-		console.log("2. Creating user in Database...");
+		// If the signing up email matches exactly, they become admin. Otherwise, customer.
+		const role = email.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() ? "admin" : "customer";
+		// -----------------------------
+
+		console.log(`2. Creating user as ${role}...`);
 		const user = await User.create({ name, email, password, role });
 
-		console.log("3. Attempting to generate tokens...");
+		console.log("3. Generating tokens...");
 		let tokens;
 		try {
 			tokens = generateTokens(user._id);
@@ -69,10 +72,7 @@ export const signup = async (req, res) => {
 			return res.status(500).json({ message: "JWT Secret keys are missing in .env file" });
 		}
 
-		console.log("4. Storing refresh token...");
 		await storeRefreshToken(user._id, tokens.refreshToken);
-
-		console.log("5. Setting cookies...");
 		setCookies(res, tokens.accessToken, tokens.refreshToken);
 
 		console.log("6. Signup successful!");
