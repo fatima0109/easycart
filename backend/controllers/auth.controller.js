@@ -17,7 +17,7 @@ const generateTokens = (userId) => {
 };
 
 const storeRefreshToken = async (userId, refreshToken) => {
-	// Fixed Redis v4 syntax: { EX: seconds }
+	// Standard Redis v4 syntax: { EX: seconds }
 	await redis.set(`refresh_token:${userId}`, refreshToken, { EX: 7 * 24 * 60 * 60 });
 };
 
@@ -59,15 +59,18 @@ export const signup = async (req, res) => {
 			return res.status(400).json({ message: "User already exists" });
 		}
 
-		// 3. Setup OTP and Hashing
+		// 3. Setup OTP
 		const otp = Math.floor(100000 + Math.random() * 900000).toString();
-		const hashedPassword = await bcrypt.hash(password, 10);
 
-		// 4. Store in Redis (Fixed syntax { EX: 600 })
-		const tempData = JSON.stringify({ name, email: lowerCaseEmail, password: hashedPassword, otp });
-		await redis.set(`tempUser:${lowerCaseEmail}`, tempData, { EX: 600 });
+		/**
+		 * NOTE: We store the PLAIN password in Redis temporarily.
+		 * The hashing will happen automatically in the User.model 'pre-save' hook
+		 * when we call User.create() in the verifyOTP step.
+		 */
+		const tempData = JSON.stringify({ name, email: lowerCaseEmail, password, otp });
+		await redis.set(`tempUser:${lowerCaseEmail}`, tempData, { EX: 600 }); // 10 minute expiry
 
-		// 5. Send Mail
+		// 4. Send Mail
 		await sendOTPEmail(lowerCaseEmail, otp);
 
 		res.status(200).json({ message: "OTP sent to your email. Please verify within 10 minutes." });
@@ -88,7 +91,12 @@ export const verifyOTP = async (req, res) => {
 			return res.status(400).json({ message: "OTP expired or not found. Please sign up again." });
 		}
 
-		const { name, password: hashedPassword, otp: storedOtp } = JSON.parse(cachedData);
+		/**
+		 * FIX: Check if cachedData is a string or already an object.
+		 * This prevents the "[object Object] is not valid JSON" error.
+		 */
+		const parsedData = typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData;
+		const { name, password, otp: storedOtp } = parsedData;
 
 		// 2. Compare OTP
 		if (otp !== storedOtp) {
@@ -96,10 +104,11 @@ export const verifyOTP = async (req, res) => {
 		}
 
 		// 3. Create actual user in MongoDB
+		// This triggers the pre-save hook in your model to hash the password correctly.
 		const user = await User.create({
 			name,
 			email: lowerCaseEmail,
-			password: hashedPassword,
+			password,
 		});
 
 		// 4. Log them in (Tokens & Cookies)
@@ -128,7 +137,7 @@ export const login = async (req, res) => {
 		const lowerCaseEmail = email.toLowerCase().trim();
 		const user = await User.findOne({ email: lowerCaseEmail });
 
-		// Note: Ensure your User model has the comparePassword method
+		// Uses the .comparePassword method from your user.model.js
 		if (user && (await user.comparePassword(password))) {
 			const { accessToken, refreshToken } = generateTokens(user._id);
 			await storeRefreshToken(user._id, refreshToken);
@@ -157,11 +166,10 @@ export const logout = async (req, res) => {
 				const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 				await redis.del(`refresh_token:${decoded.userId}`);
 			} catch (err) {
-				// Token invalid/expired, just proceed
+				// Proceed if token is invalid/expired
 			}
 		}
 
-		// Clear cookies with the same options used to set them
 		const clearOptions = { httpOnly: true, secure: true, sameSite: "none" };
 		res.clearCookie("accessToken", clearOptions);
 		res.clearCookie("refreshToken", clearOptions);
