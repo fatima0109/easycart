@@ -72,46 +72,45 @@ export const signup = async (req, res) => {
 };
 
 export const verifyOTP = async (req, res) => {
-	const { email, otp } = req.body;
-	try {
-		// 1. Get data from Redis
-		const data = await redis.get(`temp-user:${email}`);
-		if (!data) return res.status(400).json({ message: "OTP expired or invalid session" });
+    const { email, otp } = req.body;
+    try {
+        const data = await redis.get(`temp-user:${email}`);
+        if (!data) return res.status(400).json({ message: "OTP expired or invalid session" });
 
-		const { name, password, otp: storedOtp } = JSON.parse(data);
+        const { name, password, otp: storedOtp } = JSON.parse(data);
 
-		// 2. Validate OTP
-		if (otp !== storedOtp) {
-			return res.status(400).json({ message: "Incorrect OTP code" });
-		}
+        if (otp !== storedOtp) {
+            return res.status(400).json({ message: "Incorrect OTP code" });
+        }
 
-		// 3. Hardcoded Admin Logic
-		// Use your admin email: usertest9644@gmail.com
-		const MASTER_ADMIN_EMAIL = "usertest9644@gmail.com"; 
-		const role = email.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() ? "admin" : "customer";
+        // --- FIX THIS LINE ---
+        // Make sure this matches your hardcoded admin email exactly
+        const MASTER_ADMIN_EMAIL = "usertest9644@gmail.com"; 
+        const role = email.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() ? "admin" : "customer";
 
-		// 4. Create actual user in MongoDB
-		const user = await User.create({ name, email, password, role });
+        // Create user
+        const user = await User.create({ name, email, password, role });
 
-		// 5. Generate Access & Refresh Tokens
-		const { accessToken, refreshToken } = generateTokens(user._id);
-		await storeRefreshToken(user._id, refreshToken);
-		setCookies(res, accessToken, refreshToken);
+        // Generate tokens
+        const { accessToken, refreshToken } = generateTokens(user._id);
+        await storeRefreshToken(user._id, refreshToken);
+        setCookies(res, accessToken, refreshToken);
 
-		// 6. Clean up Redis (remove temp data)
-		await redis.del(`temp-user:${email}`);
+        await redis.del(`temp-user:${email}`);
 
-		res.status(201).json({
-			_id: user._id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		});
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        });
 
-	} catch (error) {
-		console.error("Verify OTP Error:", error.message);
-		res.status(500).json({ message: error.message });
-	}
+    } catch (error) {
+        console.error("Verify OTP Error:", error.message);
+        // This is where the 500 error comes from. 
+        // Checking Render logs now will show the EXACT error message.
+        res.status(500).json({ message: error.message });
+    }
 };
 
 export const login = async (req, res) => {
