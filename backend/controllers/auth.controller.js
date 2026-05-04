@@ -1,211 +1,199 @@
 import { redis } from "../lib/redis.js";
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs"; // MISSING: Needed for password hashing/comparison
+import bcrypt from "bcryptjs";
 import { sendOTPEmail } from "../lib/nodemailer.js";
 
+// --- HELPERS ---
+
 const generateTokens = (userId) => {
-	const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
-		expiresIn: "15m",
-	});
-
-	const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
-		expiresIn: "7d",
-	});
-
-	return { accessToken, refreshToken };
+    const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "15m",
+    });
+    const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: "7d",
+    });
+    return { accessToken, refreshToken };
 };
 
 const storeRefreshToken = async (userId, refreshToken) => {
-	await redis.set(`refresh_token:${userId}`, refreshToken, { ex: 604800 }); // 7 days
+    // Standard Redis syntax: "EX" followed by seconds
+    await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 7 * 24 * 60 * 60); 
 };
 
 const setCookies = (res, accessToken, refreshToken) => {
-	res.cookie("accessToken", accessToken, {
-		httpOnly: true, 
-		secure: true, 
-		sameSite: "none", 
-		maxAge: 15 * 60 * 1000, 
-	});
-	res.cookie("refreshToken", refreshToken, {
-		httpOnly: true, 
-		secure: true, 
-		sameSite: "none", 
-		maxAge: 7 * 24 * 60 * 60 * 1000, 
-	});
+    // IMPORTANT: For Vercel (Frontend) and Render (Backend) to work, 
+    // you MUST use sameSite: "none" and secure: true
+    const cookieOptions = {
+        httpOnly: true,
+        secure: true, // Must be true for sameSite: "none"
+        sameSite: "none", // Required for cross-domain cookies
+    };
+
+    res.cookie("accessToken", accessToken, {
+        ...cookieOptions,
+        maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+        ...cookieOptions,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 };
 
 // --- CONTROLLERS ---
 
 export const signup = async (req, res) => {
-	const { email, password, name } = req.body;
-	try {
-		// 1. Password Validation
-		const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-		if (!passwordRegex.test(password)) {
-			return res.status(400).json({ 
-				message: "Password must be 8+ chars with uppercase, lowercase, number, and special char." 
-			});
-		}
+    const { email, password, name } = req.body;
+    try {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({ 
+                message: "Password must be 8+ chars with uppercase, lowercase, number, and special char." 
+            });
+        }
 
-		// 2. Check if user already exists in MongoDB
-		const userExists = await User.findOne({ email });
-		if (userExists) {
-			return res.status(400).json({ message: "User already exists" });
-		}
+        const lowerCaseEmail = email.toLowerCase().trim();
 
-		// 3. Generate 6-digit OTP
-		const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const userExists = await User.findOne({ email: lowerCaseEmail });
+        if (userExists) {
+            return res.status(400).json({ message: "User already exists" });
+        }
 
-		// 4. Store user data temporarily in Redis for 10 minutes
-		const tempData = JSON.stringify({ name, email, password, otp });
-		await redis.set(`temp-user:${email}`, tempData, { ex: 600 }); 
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-		// 5. Send the OTP via Email
-		await sendOTPEmail(email, otp);
+        const tempData = JSON.stringify({ name, email: lowerCaseEmail, password: hashedPassword, otp });
+        // Use standard "EX" syntax
+        await redis.set(`tempUser:${lowerCaseEmail}`, tempData, "EX", 600); 
 
-		res.status(200).json({ message: "OTP sent to your email. Please verify within 10 minutes." });
+        await sendOTPEmail(lowerCaseEmail, otp);
 
-	} catch (error) {
-		console.error("Signup Error:", error.message);
-		res.status(500).json({ message: error.message });
-	}
+        res.status(200).json({ message: "OTP sent to your email. Please verify within 10 minutes." });
+
+    } catch (error) {
+        console.error("Signup Error:", error.message);
+        res.status(500).json({ message: error.message });
+    }
 };
 
-// backend/controllers/auth.controller.js
-
 export const verifyOTP = async (req, res) => {
-	try {
-		const { email, otp } = req.body;
+    try {
+        const { email, otp } = req.body;
+        const lowerCaseEmail = email.toLowerCase().trim();
 
-		// 1. Get data from Redis
-		const cachedData = await redis.get(`tempUser:${email}`);
+        const cachedData = await redis.get(`tempUser:${lowerCaseEmail}`);
 
-		// Check if data exists at all (prevents JSON.parse(null) crash)
-		if (!cachedData) {
-			return res.status(400).json({ message: "OTP expired. Please sign up again." });
-		}
+        if (!cachedData) {
+            return res.status(400).json({ message: "OTP expired. Please sign up again." });
+        }
 
-		const { name, password, otp: storedOtp } = JSON.parse(cachedData);
+        const { name, password: hashedPassword, otp: storedOtp } = JSON.parse(cachedData);
 
-		// 2. Verify OTP
-		if (otp !== storedOtp) {
-			return res.status(400).json({ message: "Invalid OTP code" });
-		}
+        if (otp !== storedOtp) {
+            return res.status(400).json({ message: "Invalid OTP code" });
+        }
 
-		// 3. Create User in MongoDB (now that email is verified)
-		// Make sure all required fields in your User model are handled here
-		const user = await User.create({
-			name,
-			email,
-			password, // This should be hashed already if you hashed it before storing in Redis
-		});
+        // Create User
+        const user = await User.create({
+            name,
+            email: lowerCaseEmail,
+            password: hashedPassword,
+        });
 
-		// 4. Generate Tokens (Ensure these secrets exist in your .env!)
-		const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-		const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+        // Use Helper functions (Don't write JWT logic twice!)
+        const { accessToken, refreshToken } = generateTokens(user._id);
+        await storeRefreshToken(user._id, refreshToken);
+        setCookies(res, accessToken, refreshToken);
 
-		// 5. Store Refresh Token in Redis (for the refresh-token logic)
-		await redis.set(`refresh_token:${user._id}`, refreshToken, "EX", 7 * 24 * 60 * 60);
+        // Cleanup Redis
+        await redis.del(`tempUser:${lowerCaseEmail}`);
 
-		// 6. Set Cookies
-		res.cookie("accessToken", accessToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict",
-			maxAge: 15 * 60 * 1000,
-		});
-		res.cookie("refreshToken", refreshToken, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict",
-			maxAge: 7 * 24 * 60 * 60 * 1000,
-		});
-
-		// 7. Cleanup Redis
-		await redis.del(`tempUser:${email}`);
-
-		res.status(201).json({
-			_id: user._id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		});
-	} catch (error) {
-		console.error("Error in verifyOTP:", error.message); // THIS WILL SHOW IN YOUR RENDER LOGS
-		res.status(500).json({ message: "Server error during verification" });
-	}
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role, 
+        });
+    } catch (error) {
+        console.error("Error in verifyOTP:", error.message);
+        res.status(500).json({ message: "Server error during verification" });
+    }
 };
 
 export const login = async (req, res) => {
-	try {
-		const { email, password } = req.body;
-		const user = await User.findOne({ email });
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
 
-		if (user && (await user.comparePassword(password))) {
-			const { accessToken, refreshToken } = generateTokens(user._id);
-			await storeRefreshToken(user._id, refreshToken);
-			setCookies(res, accessToken, refreshToken);
+        if (user && (await user.comparePassword(password))) {
+            const { accessToken, refreshToken } = generateTokens(user._id);
+            await storeRefreshToken(user._id, refreshToken);
+            setCookies(res, accessToken, refreshToken);
 
-			res.json({
-				_id: user._id,
-				name: user.name,
-				email: user.email,
-				role: user.role, 
-			});
-		} else {
-			res.status(400).json({ message: "Invalid email or password" });
-		}
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role, 
+            });
+        } else {
+            res.status(400).json({ message: "Invalid email or password" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 export const logout = async (req, res) => {
-	try {
-		const refreshToken = req.cookies.refreshToken;
-		if (refreshToken) {
-			const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-			await redis.del(`refresh_token:${decoded.userId}`);
-		}
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        if (refreshToken) {
+            try {
+                const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+                await redis.del(`refresh_token:${decoded.userId}`);
+            } catch (err) {
+                // Token might be expired, just proceed to clear cookies
+            }
+        }
 
-		res.clearCookie("accessToken");
-		res.clearCookie("refreshToken");
-		res.json({ message: "Logged out successfully" });
-	} catch (error) {
-		res.status(500).json({ message: "Server error", error: error.message });
-	}
+        res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "none" });
+        res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "none" });
+        res.json({ message: "Logged out successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
 };
 
 export const refreshToken = async (req, res) => {
-	try {
-		const refreshToken = req.cookies.refreshToken;
-		if (!refreshToken) return res.status(401).json({ message: "No refresh token provided" });
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) return res.status(401).json({ message: "No refresh token provided" });
 
-		const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-		const storedToken = await redis.get(`refresh_token:${decoded.userId}`);
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const storedToken = await redis.get(`refresh_token:${decoded.userId}`);
 
-		if (storedToken !== refreshToken) return res.status(401).json({ message: "Invalid refresh token" });
+        if (storedToken !== refreshToken) return res.status(401).json({ message: "Invalid refresh token" });
 
-		const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+        const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 
-		res.cookie("accessToken", accessToken, {
-			httpOnly: true,
-			secure: true,
-			sameSite: "none",
-			maxAge: 15 * 60 * 1000,
-		});
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 15 * 60 * 1000,
+        });
 
-		res.json({ message: "Token refreshed successfully" });
-	} catch (error) {
-		res.status(500).json({ message: "Server error", error: error.message });
-	}
+        res.json({ message: "Token refreshed successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
 };
 
 export const getProfile = async (req, res) => {
-	try {
-		res.json(req.user);
-	} catch (error) {
-		res.status(500).json({ message: "Server error", error: error.message });
-	}
+    try {
+        // req.user is usually populated by a "protectRoute" middleware
+        res.json(req.user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
 };

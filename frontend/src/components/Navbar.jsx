@@ -218,10 +218,6 @@ const Navbar = () => {
       </AnimatePresence>
     </header>
 
-    {/* --- CONTENT SPACER --- */}
-      {/* This pushes the "Admin Dashboard" and other page content down so it doesn't hide behind the navbar */}
-      <div className="d-none d-md-block" style={{ height: '90px' }}></div>
-      <div className="d-md-none" style={{ height: '80px' }}></div>
   </>
       
   );

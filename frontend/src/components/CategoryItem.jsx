@@ -1,78 +1,98 @@
 // frontend/src/components/CategoryItem.jsx
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 
 const CategoryItem = ({ category }) => {
   return (
     <motion.div
-      // We use a style object here to GUARANTEE the height is 400px
-      style={{ 
-        height: '400px', 
-        width: '100%', 
-        position: 'relative',
-        borderRadius: '1rem',
-        overflow: 'hidden',
-        border: '1px solid #E0E0E0',
-        backgroundColor: '#fff'
-      }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      whileHover={{ y: -8 }}
+      style={{ height: '100%' }} // Ensure cards in a row have equal height
     >
-      <Link to={"/category/" + category.href} style={{ display: 'block', height: '100%', width: '100%' }}>
-        
-        {/* THE IMAGE: Forced to fill the 400px container exactly */}
-        <img
-          src={category.imageUrl}
-          alt={category.name}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover', // This prevents the 'big/small' height issue
-            display: 'block'
-          }}
-          className="transition-transform duration-700 ease-out group-hover:scale-110"
-        />
-
-        {/* Gradient Overlay - Navy */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(to top, rgba(31, 42, 68, 0.95), rgba(31, 42, 68, 0.4), transparent)',
-          zIndex: 1
-        }} />
-
-        {/* Content overlay */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: '1.5rem',
-          zIndex: 10
+      <div style={{ 
+        backgroundColor: '#fff', 
+        padding: '1.5rem', 
+        borderRadius: '8px', 
+        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+        height: '420px', // Uniform height
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid #f0f0f0',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+      }}
+      className="category-card-hover"
+      >
+        {/* Title Section */}
+        <h3 style={{ 
+          color: '#1F2A44', 
+          fontSize: '1.25rem', 
+          fontWeight: 800, 
+          marginBottom: '1rem',
+          letterSpacing: '-0.2px',
+          minHeight: '3rem', // Keeps alignment if title wraps
+          lineHeight: '1.2'
         }}>
-          <h3 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
-            {category.name}
-          </h3>
-          
-          <p style={{ color: '#e5e7eb', fontSize: '0.875rem', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            Explore {category.name}
-            <ArrowRight size={16} />
-          </p>
+          {category.name}
+        </h3>
 
-          {/* Decorative Copper Underline */}
-          <div style={{
-            width: '40px',
-            height: '4px',
-            background: 'linear-gradient(to right, #C97C5D, #B96A4E)',
-            borderRadius: '99px',
-            marginTop: '0.75rem'
-          }} />
+        {/* Main Image Container */}
+        <Link 
+          to={"/category/" + category.href} 
+          style={{ 
+            flex: 1, 
+            overflow: 'hidden', 
+            borderRadius: '4px',
+            backgroundColor: '#F9F9F9', // Light grey for product background
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '1.25rem',
+            textDecoration: 'none'
+          }}
+        >
+          <motion.img
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.4 }}
+            src={category.imageUrl}
+            alt={category.name}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover', // Change to 'contain' if you want white margins around products
+            }}
+          />
+        </Link>
+
+        {/* Footer Section */}
+        <div style={{ marginTop: 'auto' }}>
+          <Link 
+            to={"/category/" + category.href} 
+            style={{ 
+              color: '#C97C5D', // Your brand copper color
+              fontSize: '0.9rem', 
+              fontWeight: 700, 
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            Explore {category.name}
+            <span style={{ fontSize: '1.2rem' }}>→</span>
+          </Link>
+          
+          {/* Subtle accent bar */}
+          <div style={{ 
+            width: '30px', 
+            height: '2px', 
+            backgroundColor: '#C97C5D', 
+            marginTop: '4px',
+            opacity: 0.4 
+          }}></div>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 };

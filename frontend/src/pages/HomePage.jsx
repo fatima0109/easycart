@@ -89,9 +89,21 @@ const HomePage = () => {
 				</section>
 			) : (
 				<>
-                    {/* --- PREMIUM HERO SECTION --- */}
-                    <section className='position-relative overflow-hidden py-5 py-md-5 mt-4'>
-                        <div className='container'>
+{/* --- PREMIUM HERO SECTION --- */}
+                    <section 
+                        className='position-relative overflow-hidden mt-0 pt-0'
+                        style={{ 
+                            backgroundImage: `linear-gradient(rgba(245, 243, 239, 0.7), rgba(245, 243, 239, 0.7)), url('/background.jpg')`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            minHeight: '700px', // Increased height to look more professional
+                            display: 'flex',
+                            alignItems: 'center',
+                            /* This ensures the text starts after the navbar height */
+                            paddingTop: '120px' 
+                        }}
+                    >
+                        <div className='container'> 
                             <div className="row justify-content-center"> 
                                 <div className="col-lg-8 text-center"> 
                                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
