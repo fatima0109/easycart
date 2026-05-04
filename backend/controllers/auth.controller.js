@@ -72,46 +72,69 @@ export const signup = async (req, res) => {
 	}
 };
 
+// backend/controllers/auth.controller.js
+
 export const verifyOTP = async (req, res) => {
-    const { email, otp } = req.body;
-    try {
-        const data = await redis.get(`temp-user:${email}`);
-        if (!data) return res.status(400).json({ message: "OTP expired or invalid session" });
+	try {
+		const { email, otp } = req.body;
 
-        const { name, password, otp: storedOtp } = JSON.parse(data);
+		// 1. Get data from Redis
+		const cachedData = await redis.get(`tempUser:${email}`);
 
-        if (otp !== storedOtp) {
-            return res.status(400).json({ message: "Incorrect OTP code" });
-        }
+		// Check if data exists at all (prevents JSON.parse(null) crash)
+		if (!cachedData) {
+			return res.status(400).json({ message: "OTP expired. Please sign up again." });
+		}
 
-        // --- FIX THIS LINE ---
-        // Make sure this matches your hardcoded admin email exactly
-        const MASTER_ADMIN_EMAIL = "usertest9644@gmail.com"; 
-        const role = email.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase() ? "admin" : "customer";
+		const { name, password, otp: storedOtp } = JSON.parse(cachedData);
 
-        // Create user
-        const user = await User.create({ name, email, password, role });
+		// 2. Verify OTP
+		if (otp !== storedOtp) {
+			return res.status(400).json({ message: "Invalid OTP code" });
+		}
 
-        // Generate tokens
-        const { accessToken, refreshToken } = generateTokens(user._id);
-        await storeRefreshToken(user._id, refreshToken);
-        setCookies(res, accessToken, refreshToken);
+		// 3. Create User in MongoDB (now that email is verified)
+		// Make sure all required fields in your User model are handled here
+		const user = await User.create({
+			name,
+			email,
+			password, // This should be hashed already if you hashed it before storing in Redis
+		});
 
-        await redis.del(`temp-user:${email}`);
+		// 4. Generate Tokens (Ensure these secrets exist in your .env!)
+		const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+		const refreshToken = jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
 
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-        });
+		// 5. Store Refresh Token in Redis (for the refresh-token logic)
+		await redis.set(`refresh_token:${user._id}`, refreshToken, "EX", 7 * 24 * 60 * 60);
 
-    } catch (error) {
-        console.error("Verify OTP Error:", error.message);
-        // This is where the 500 error comes from. 
-        // Checking Render logs now will show the EXACT error message.
-        res.status(500).json({ message: error.message });
-    }
+		// 6. Set Cookies
+		res.cookie("accessToken", accessToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
+			maxAge: 15 * 60 * 1000,
+		});
+		res.cookie("refreshToken", refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
+			maxAge: 7 * 24 * 60 * 60 * 1000,
+		});
+
+		// 7. Cleanup Redis
+		await redis.del(`tempUser:${email}`);
+
+		res.status(201).json({
+			_id: user._id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+		});
+	} catch (error) {
+		console.error("Error in verifyOTP:", error.message); // THIS WILL SHOW IN YOUR RENDER LOGS
+		res.status(500).json({ message: "Server error during verification" });
+	}
 };
 
 export const login = async (req, res) => {
