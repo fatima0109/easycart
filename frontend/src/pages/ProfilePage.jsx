@@ -12,7 +12,8 @@ const navItems = [
 
 const ProfilePage = () => {
   return (
-    <div style={{ backgroundColor: '#F5F3EF', minHeight: '100vh', paddingTop: '1.5rem', paddingBottom: '4rem' }}>
+    /* INCREASED paddingTop TO 6rem TO CLEAR THE NAVIGATION BAR */
+    <div style={{ backgroundColor: '#F5F3EF', minHeight: '100vh', paddingTop: '6rem', paddingBottom: '4rem' }}>
       <div className="container">
         <motion.h1
           style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1F2A44', marginBottom: '1.5rem' }}
