@@ -4,10 +4,6 @@ import { useEffect, useState } from "react";
 import { Ticket, Trash2, CheckCircle, Gift } from "lucide-react";
 import { useCartStore } from "../stores/useCartStore";
 
-/**
- * GiftCouponCard Component - Professional Formal Redesign
- * Uses Navy (#1F2A44), Beige (#F5F3EF), and Copper (#C97C5D)
- */
 const GiftCouponCard = () => {
   const [userInputCode, setUserInputCode] = useState("");
   const { coupon, isCouponApplied, applyCoupon, getMyCoupon, removeCoupon } = useCartStore();
@@ -28,10 +24,9 @@ const GiftCouponCard = () => {
 
   return (
     <motion.div
-      className="space-y-5 rounded-2xl border border-[#E0E0E0] bg-white p-5 shadow-sm sm:p-6 transition-all duration-300 hover:shadow-md"
-      initial={{ opacity: 0, y: 30 }}
+      className="space-y-5 rounded-2xl border border-[#E0E0E0] bg-white p-5 shadow-sm sm:p-6"
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
     >
       {/* Coupon Input Section */}
       <div className="space-y-4">
@@ -41,19 +36,23 @@ const GiftCouponCard = () => {
             Have a voucher or gift card?
           </label>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3">
+        
+        {/* Input and Button Container */}
+        <div className="flex flex-col gap-3">
           <input
             type="text"
             id="voucher"
-            className="flex-1 rounded-lg border border-[#E0E0E0] bg-white p-3 text-sm text-[#222222] placeholder-[#9E9E9E] focus:border-[#C97C5D] focus:ring-2 focus:ring-[#C97C5D]/20 transition-all duration-200"
+            className="w-full rounded-lg border border-[#E0E0E0] bg-white p-3 text-sm text-[#222222] focus:border-[#C97C5D] outline-none transition-all"
             placeholder="Enter promo code (e.g., SAVE20)"
             value={userInputCode}
             onChange={(e) => setUserInputCode(e.target.value)}
           />
+          
           <motion.button
             type="button"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#C97C5D] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#B96A4E] focus:outline-none focus:ring-2 focus:ring-[#C97C5D] transition-all duration-200"
-            whileHover={{ scale: 1.02 }}
+            className="w-full flex items-center justify-center gap-2 rounded-lg py-3 px-6 text-sm font-bold text-white shadow-md border-0 transition-all"
+            style={{ backgroundColor: '#C97C5D' }} // FORCING COPPER COLOR
+            whileHover={{ backgroundColor: '#B96A4E' }}
             whileTap={{ scale: 0.98 }}
             onClick={handleApplyCoupon}
           >
@@ -68,7 +67,6 @@ const GiftCouponCard = () => {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
           className="mt-4 rounded-xl border border-[#4CAF50]/30 bg-[#4CAF50]/10 p-4"
         >
           <div className="flex items-start justify-between">
@@ -81,31 +79,28 @@ const GiftCouponCard = () => {
                 </p>
               </div>
             </div>
-            <motion.button
+            <button
               type="button"
-              className="rounded-lg bg-[#D9534F]/10 p-2 text-[#D9534F] hover:bg-[#D9534F]/20 transition-all duration-200"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="p-2 text-[#D9534F] hover:bg-[#D9534F]/10 rounded-lg transition-colors"
               onClick={handleRemoveCoupon}
-              aria-label="Remove coupon"
             >
               <Trash2 className="h-4 w-4" />
-            </motion.button>
+            </button>
           </div>
         </motion.div>
       )}
 
-      {/* User's Available Coupon (Beige Background) */}
-      {coupon && !isCouponApplied && (
-        <div className="mt-4 rounded-xl border border-[#E0E0E0] bg-[#F5F3EF] p-4">
+      {/* --- HARDCODED AVAILABLE REWARD --- */}
+      {!isCouponApplied && (
+        <div className="mt-2 rounded-xl border border-[#E0E0E0] bg-[#F5F3EF] p-4">
           <div className="flex items-start gap-3">
             <Ticket className="h-5 w-5 text-[#1F2A44] mt-0.5" />
             <div>
-              <h3 className="font-bold text-[#1F2A44]">Available Reward</h3>
-              <p className="text-sm text-[#6B6B6B] mt-1">
-                Code: <span className="font-bold text-[#222222]">{coupon.code}</span> ({coupon.discountPercentage}% discount)
+              <h3 className="font-bold text-[#1F2A44] text-sm">Available Reward</h3>
+              <p className="text-xs text-[#6B6B6B] mt-1">
+                Code: <span className="font-bold text-[#C97C5D]">GIFTK8SDS7</span> (10% discount)
               </p>
-              <p className="text-xs text-[#9E9E9E] mt-2 italic">Apply this code at checkout to save on your order.</p>
+              <p className="text-[10px] text-[#9E9E9E] mt-1 italic">Copy and paste this code above to save.</p>
             </div>
           </div>
         </div>

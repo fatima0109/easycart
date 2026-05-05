@@ -41,7 +41,7 @@ const CartPage = () => {
   const { cart } = useCartStore();
 
   return (
-    <div style={{ backgroundColor: '#F5F3EF', minHeight: '100vh', paddingTop: '2rem', paddingBottom: '4rem' }}>
+    <div style={{ backgroundColor: '#F5F3EF', minHeight: '100vh', paddingTop: '6rem', paddingBottom: '4rem' }}>
       <div className="container">
 
         {/* Header */}
@@ -58,8 +58,9 @@ const CartPage = () => {
         </div>
 
         <div className="row g-4">
-          {/* Cart Items */}
-          <div className="col-lg-8">
+          
+          {/* 1. Cart Items */}
+          <div className="col-lg-8 order-1">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               {cart.length === 0 ? (
                 <div className="card p-5" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E0E0E0', borderRadius: '14px' }}>
@@ -86,24 +87,28 @@ const CartPage = () => {
                   </div>
                 </div>
               )}
-
-              {cart.length > 0 && (
-                <div className="mt-4">
-                  <PeopleAlsoBought />
-                </div>
-              )}
             </motion.div>
           </div>
 
-          {/* Sidebar */}
+          {/* 2. Sidebar (Checkout & Coupon) - Now order-2, meaning it renders ABOVE PeopleAlsoBought on Mobile */}
           {cart.length > 0 && (
-            <div className="col-lg-4">
+            <div className="col-lg-4 order-2">
               <div className="sticky-top d-flex flex-column gap-3">
                 <OrderSummary />
                 <GiftCouponCard />
               </div>
             </div>
           )}
+
+          {/* 3. People Also Bought - Extracted from Cart Items column to fix mobile order */}
+          {cart.length > 0 && (
+            <div className="col-lg-8 order-3">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <PeopleAlsoBought />
+              </motion.div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
