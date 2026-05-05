@@ -167,9 +167,6 @@ const HomePage = () => {
                                     <h2 className='h2 fw-bold text-[#1F2A44] mb-2'>Shop by Category</h2>
                                     <p className='text-[#6B6B6B] mb-0'>Find premium quality in every department.</p>
                                 </div>
-                                <Link to="/category/fashion" className="text-[#FF782D] fw-bold text-decoration-none d-none d-md-block">
-                                    Browse All Categories <ArrowRight size={16} />
-                                </Link>
                             </div>
 
                             <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 category-grid'>
