@@ -24,7 +24,8 @@ const GiftCouponCard = () => {
 
   return (
     <motion.div
-      className="space-y-5 rounded-2xl border border-[#E0E0E0] bg-white p-5 shadow-sm sm:p-6"
+      // ADDED 'relative' and 'z-[1]' here 👇
+      className="relative z-[1] space-y-5 rounded-2xl border border-[#E0E0E0] bg-white p-5 shadow-sm sm:p-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >

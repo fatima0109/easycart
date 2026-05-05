@@ -31,7 +31,13 @@ const OrderSummary = () => {
   return (
     <motion.div
       className="card p-4 shadow-sm"
-      style={{ backgroundColor: '#FFFFFF', border: '1px solid #E0E0E0', borderRadius: '14px' }}
+      style={{ 
+        backgroundColor: '#FFFFFF', 
+        border: '1px solid #E0E0E0', 
+        borderRadius: '14px',
+        position: 'relative', // Added to make zIndex take effect
+        zIndex: 1             // Added a low z-index to stay below navbar
+      }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
