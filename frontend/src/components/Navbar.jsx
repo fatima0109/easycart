@@ -15,7 +15,7 @@ const Navbar = () => {
 
   return (
   <>
-    <header className="fixed-top bg-white" style={{ borderBottom: '1px solid #E0E0E0', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', zIndex: 1000 }}>
+    <header className="fixed-top bg-white" style={{ position: 'fixed', top: 0, width: '100%', borderBottom: '1px solid #E0E0E0', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', zIndex: 9999 }}>
 
       {/* TOP STRIP */}
       <div style={{ backgroundColor: '#1F2A44', padding: '6px 0', fontSize: '0.72rem', fontWeight: 600, color: 'rgba(255,255,255,0.8)', textAlign: 'center', letterSpacing: '0.06em' }}>
